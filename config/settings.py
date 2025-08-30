@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     # Third-party
     "rest_framework",
+    "rest_framework.authtoken",
     "corsheaders",
     # Local
     "api",
@@ -136,10 +137,12 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 # DRF baseline — adjust later when we add auth/permissions
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework.authentication.TokenAuthentication",
         "rest_framework.authentication.SessionAuthentication",
         "rest_framework.authentication.BasicAuthentication",
     ],
     "DEFAULT_PERMISSION_CLASSES": [
+        "rest_framework.permissions.IsAuthenticatedOrReadOnly",
         "rest_framework.permissions.AllowAny",
     ],
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
@@ -148,3 +151,5 @@ REST_FRAMEWORK = {
 
 # CORS (open in dev only)
 CORS_ALLOW_ALL_ORIGINS = True
+
+AUTH_USER_MODEL = "api.User"
