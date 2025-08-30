@@ -4,9 +4,14 @@ from rest_framework.response import Response
 from rest_framework import status, generics
 from rest_framework.views import APIView
 
-from .serializers import RegisterSerializer, LoginSerializer, UserSerializer
+from .serializers import (
+    RegisterSerializer,
+    LoginSerializer,
+    UserSerializer,
+    CategorySerializer,
+)
 from .permissions import IsAdminOrSelf
-from .models import User
+from .models import User, Category
 
 
 class HealthCheckView(APIView):
@@ -71,3 +76,33 @@ class UserDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes = [IsAdminOrSelf]
+
+
+class CategoryListCreateAPIView(generics.ListCreateAPIView):
+    """
+    GET /api/categories/  -> list all categories (public)
+    POST /api/categories/ -> create new category (admin only)
+    """
+
+    queryset = Category.objects.all().order_by("name")
+    serializer_class = CategorySerializer
+
+    def get_permissions(self):
+        if self.request.method == "POST":
+            return [IsAdminUser()]
+        return [AllowAny()]
+
+
+class CategoryDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
+    """
+    GET /api/categories/<id>/  -> public
+    PUT/PATCH/DELETE -> admin only
+    """
+
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+
+    def get_permissions(self):
+        if self.request.method in ["PUT", "PATCH", "DELETE"]:
+            return [IsAdminUser()]
+        return [AllowAny()]

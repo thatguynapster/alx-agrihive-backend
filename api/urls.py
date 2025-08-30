@@ -5,6 +5,8 @@ from .views import (
     LoginAPIView,
     UserListAPIView,
     UserDetailAPIView,
+    CategoryDetailAPIView,
+    CategoryListCreateAPIView,
 )
 
 urlpatterns = [
@@ -15,4 +17,9 @@ urlpatterns = [
     # Users
     path("users/", UserListAPIView.as_view(), name="user-list"),
     path("users/<int:pk>/", UserDetailAPIView.as_view(), name="user-detail"),
+    # Categories
+    path("categories/", CategoryListCreateAPIView.as_view(), name="category-list"),
+    path(
+        "categories/<int:pk>/", CategoryDetailAPIView.as_view(), name="category-detail"
+    ),
 ]
