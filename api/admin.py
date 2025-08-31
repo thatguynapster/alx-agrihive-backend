@@ -46,3 +46,18 @@ class CategoryAdmin(admin.ModelAdmin):
     list_display = ("name", "description", "created_at", "updated_at")
     search_fields = ("name",)
     readonly_fields = ("created_at", "updated_at")
+
+
+class ProductAdmin(admin.ModelAdmin):
+    list_display = (
+        "name",
+        "farmer",
+        "category",
+        "price",
+        "quantity",
+        "unit",
+        "status",
+    )
+    list_filter = ("status", "category")
+    search_fields = ("name", "farmer__email")
+    readonly_fields = ("created_at", "updated_at")

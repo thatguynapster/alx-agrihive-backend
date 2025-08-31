@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import User
+from .models import User, Category, Product
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -63,11 +63,33 @@ class LoginSerializer(serializers.Serializer):
         return attrs
 
 
-from .models import User, Category
-
-
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
         fields = ("id", "name", "description", "created_at", "updated_at")
         read_only_fields = ("id", "created_at", "updated_at")
+
+
+class ProductSerializer(serializers.ModelSerializer):
+    farmer = serializers.ReadOnlyField(source="farmer.id")  # read-only, auto-assigned
+    category_name = serializers.ReadOnlyField(
+        source="category.name"
+    )  # helpful for responses
+
+    class Meta:
+        model = Product
+        fields = (
+            "id",
+            "name",
+            "description",
+            "price",
+            "quantity",
+            "unit",
+            "status",
+            "category",
+            "category_name",
+            "farmer",
+            "created_at",
+            "updated_at",
+        )
+        read_only_fields = ("id", "farmer", "created_at", "updated_at")

@@ -11,7 +11,9 @@ from .serializers import (
     CategorySerializer,
 )
 from .permissions import IsAdminOrSelf
-from .models import User, Category
+from .models import User, Category, Product
+from .serializers import ProductSerializer
+from .permissions import IsFarmerOrAdminOwner
 
 
 class HealthCheckView(APIView):
@@ -106,3 +108,28 @@ class CategoryDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
         if self.request.method in ["PUT", "PATCH", "DELETE"]:
             return [IsAdminUser()]
         return [AllowAny()]
+
+
+class ProductListCreateAPIView(generics.ListCreateAPIView):
+    """
+    GET /api/products/ -> public list
+    POST /api/products/ -> only farmers or admin
+    """
+
+    queryset = Product.objects.all().order_by("-created_at")
+    serializer_class = ProductSerializer
+    permission_classes = [IsFarmerOrAdminOwner]
+
+    def perform_create(self, serializer):
+        serializer.save(farmer=self.request.user)
+
+
+class ProductDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
+    """
+    GET /api/products/<id>/ -> public
+    PUT/PATCH/DELETE -> only product owner (farmer) or admin
+    """
+
+    queryset = Product.objects.all()
+    serializer_class = ProductSerializer
+    permission_classes = [IsFarmerOrAdminOwner]
