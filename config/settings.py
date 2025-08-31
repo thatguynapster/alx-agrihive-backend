@@ -25,7 +25,7 @@ SECRET_KEY = "django-insecure-&uubv%7*remv33ncfa3&7dmf55v)*^s&fj&1(+hicsbbu8##8*
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["agrihive.pythonanywhere.com"]
 
 
 # Application definition
