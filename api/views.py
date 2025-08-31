@@ -10,10 +10,12 @@ from .serializers import (
     UserSerializer,
     CategorySerializer,
 )
-from .permissions import IsAdminOrSelf
-from .models import User, Category, Product
-from .serializers import ProductSerializer
+from .models import User, Category, Product, Order
 from .permissions import IsFarmerOrAdminOwner
+from .serializers import ProductSerializer
+from .serializers import OrderSerializer
+from .permissions import IsBuyerOrAdmin
+from .permissions import IsAdminOrSelf
 
 
 class HealthCheckView(APIView):
@@ -133,3 +135,49 @@ class ProductDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
     permission_classes = [IsFarmerOrAdminOwner]
+
+
+class OrderListCreateAPIView(generics.ListCreateAPIView):
+    """
+    GET /api/orders/ -> buyer sees their orders, admin sees all
+    POST /api/orders/ -> buyer only
+    """
+
+    serializer_class = OrderSerializer
+    permission_classes = [IsBuyerOrAdmin]
+
+    def get_queryset(self):
+        user = self.request.user
+        if user.is_staff:
+            return Order.objects.all().order_by("-created_at")
+        return Order.objects.filter(buyer=user).order_by("-created_at")
+
+
+class OrderDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
+    """
+    GET /api/orders/<id>/ -> buyer sees own, admin sees all
+    PUT/PATCH -> admin can update status, buyer cannot
+    DELETE -> admin only
+    """
+
+    queryset = Order.objects.all()
+    serializer_class = OrderSerializer
+    permission_classes = [IsBuyerOrAdmin]
+
+    def update(self, request, *args, **kwargs):
+        # only admins can update order status/delivery_date
+        if not request.user.is_staff:
+            return Response(
+                {"detail": "Only admins can update orders."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+        return super().update(request, *args, **kwargs)
+
+    def destroy(self, request, *args, **kwargs):
+        # only admins can delete
+        if not request.user.is_staff:
+            return Response(
+                {"detail": "Only admins can delete orders."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+        return super().destroy(request, *args, **kwargs)

@@ -9,6 +9,8 @@ from .views import (
     CategoryListCreateAPIView,
     ProductListCreateAPIView,
     ProductDetailAPIView,
+    OrderListCreateAPIView,
+    OrderDetailAPIView,
 )
 
 urlpatterns = [
@@ -27,4 +29,7 @@ urlpatterns = [
     # Products
     path("products/", ProductListCreateAPIView.as_view(), name="product-list"),
     path("products/<int:pk>/", ProductDetailAPIView.as_view(), name="product-detail"),
+    # Orders
+    path("orders/", OrderListCreateAPIView.as_view(), name="order-list"),
+    path("orders/<int:pk>/", OrderDetailAPIView.as_view(), name="order-detail"),
 ]

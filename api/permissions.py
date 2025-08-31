@@ -45,3 +45,21 @@ class IsFarmerOrAdminOwner(BasePermission):
         return request.user.is_authenticated and (
             obj.farmer == request.user or request.user.is_staff
         )
+
+
+class IsBuyerOrAdmin(BasePermission):
+    """
+    - Buyers: can only see their own orders
+    - Admins: can see all orders
+    - Create: buyer only
+    """
+
+    def has_permission(self, request, view):
+        if request.method == "POST":
+            return request.user.is_authenticated and request.user.role == "buyer"
+        return request.user.is_authenticated
+
+    def has_object_permission(self, request, view, obj):
+        if request.user.is_staff:
+            return True
+        return obj.buyer == request.user

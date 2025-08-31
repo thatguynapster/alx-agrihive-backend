@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import User, Category, Product
+from .models import User, Category, Product, Order
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -93,3 +93,41 @@ class ProductSerializer(serializers.ModelSerializer):
             "updated_at",
         )
         read_only_fields = ("id", "farmer", "created_at", "updated_at")
+
+
+class OrderSerializer(serializers.ModelSerializer):
+    buyer = serializers.ReadOnlyField(source="buyer.id")
+    product_name = serializers.ReadOnlyField(source="product.name")
+
+    class Meta:
+        model = Order
+        fields = (
+            "id",
+            "buyer",
+            "product",
+            "product_name",
+            "quantity",
+            "total_price",
+            "status",
+            "delivery_date",
+            "created_at",
+            "updated_at",
+        )
+        read_only_fields = (
+            "id",
+            "buyer",
+            "total_price",
+            "status",
+            "created_at",
+            "updated_at",
+        )
+
+    def create(self, validated_data):
+        # auto-assign buyer
+        user = self.context["request"].user
+        validated_data["buyer"] = user
+        # calculate total_price
+        validated_data["total_price"] = (
+            validated_data["product"].price * validated_data["quantity"]
+        )
+        return super().create(validated_data)
