@@ -164,3 +164,7 @@ Covers:
 -   Categories CRUD
 -   Products CRUD
 -   Orders CRUD (buyer & admin behaviors)
+
+---
+
+Find full API documentation at [AgrHive Documentation](https://documenter.getpostman.com/view/2857015/2sB3HhtNQN)
